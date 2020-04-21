@@ -3,9 +3,13 @@ package me.liujie95.game
 //object单例设计
 object Config {
 
-    val block = 64
+    var gameName = "坦克大战"
 
-    val gameWidth = 64*13
+    var gameIcon = "/img/bomb.gif"
 
-    val gameHeight = 64*13
+    val block = 60
+
+    val gameWidth = block*13
+
+    val gameHeight = block*13
 }
