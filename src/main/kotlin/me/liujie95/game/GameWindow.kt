@@ -2,6 +2,8 @@ package me.liujie95.game
 
 import javafx.scene.input.KeyCode
 import javafx.scene.input.KeyEvent
+import me.liujie95.game.business.Blockable
+import me.liujie95.game.business.Movable
 import me.liujie95.game.enums.Direction
 import me.liujie95.game.model.*
 import org.itheima.kotlin.game.core.Window
@@ -62,6 +64,15 @@ class GameWindow:Window(title = Config.gameName,
     }
 
     override fun onRefresh() {
+        //检测碰撞
+        views.filter { it is Movable }.forEach { move->
+            views.filter { it is Blockable }.forEach { block->
+                move as Movable
+                block as Blockable
+                val direction = move.willCollision(block)
+                move.notifyDirection(direction)
+            }
+        }
     }
 
 }

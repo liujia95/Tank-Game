@@ -1,15 +1,22 @@
 package me.liujie95.game.model
 
 import me.liujie95.game.Config
+import me.liujie95.game.business.Blockable
+import me.liujie95.game.business.Movable
 import me.liujie95.game.enums.Direction
 import org.itheima.kotlin.game.core.Painter
+import java.awt.Rectangle
+import java.awt.geom.Rectangle2D
 
-class Tank(override var x: Int, override var y: Int) :View {
+class Tank(override var x: Int, override var y: Int) : Movable {
     override val width: Int = Config.block
     override val height: Int = Config.block
 
-    var currentDirection:Direction = Direction.UP
-    val speed = 60
+    override var currentDirection:Direction = Direction.UP
+
+    override val speed = 8
+
+    var badDirection:Direction? = null
 
     override fun draw() {
         var imagePath = when(currentDirection){
@@ -26,12 +33,39 @@ class Tank(override var x: Int, override var y: Int) :View {
             currentDirection = direction;
             return
         }
+
+        if(direction == badDirection){
+            return
+        }
+
         when(currentDirection){
             Direction.UP -> y-=speed
             Direction.DOWN -> y+=speed
             Direction.LEFT -> x-=speed
-            Direction.RIGHT -> x+=speed
+            Direction.RIGHT ->x+=speed
         }
+
+        //检测地图边界
+        if(x<0) x = 0
+        if(x>Config.gameWidth-width) x = Config.gameWidth-width
+        if(y<0) y = 0
+        if(y>Config.gameHeight-height) y = Config.gameHeight-height
     }
 
+    //检测碰撞
+    override fun willCollision(block: Blockable): Direction? {
+
+        val collision = when {
+            block.y+block.height<=y -> false
+            y+height<=block.y -> false
+            block.x+block.width<=x -> false
+            x+width>block.x -> false
+            else -> true
+        }
+        return if(collision)currentDirection else null
+    }
+
+    override fun notifyDirection(direction: Direction?) {
+        badDirection = direction
+    }
 }
