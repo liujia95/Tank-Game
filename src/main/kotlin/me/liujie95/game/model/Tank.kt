@@ -54,18 +54,54 @@ class Tank(override var x: Int, override var y: Int) : Movable {
 
     //检测碰撞
     override fun willCollision(block: Blockable): Direction? {
-
-        val collision = when {
-            block.y+block.height<=y -> false
-            y+height<=block.y -> false
-            block.x+block.width<=x -> false
-            x+width>block.x -> false
-            else -> true
+        var x = this.x
+        var y = this.y
+        //将要碰撞时去做判断
+        when(currentDirection){
+            Direction.UP -> y-=speed
+            Direction.DOWN -> y+=speed
+            Direction.LEFT -> x-=speed
+            Direction.RIGHT ->x+=speed
         }
+        //检测碰撞，下一步是否碰撞
+//        val collision = when {
+//            block.y+block.height<=y -> false
+//            y+height<=block.y -> false
+//            block.x+block.width<=x -> false
+//            x+width>block.x -> false
+//            else -> true
+//        }
+        val collision = checkCollision(block.x,block.y,block.width,block.height,x,y,width,height)
         return if(collision)currentDirection else null
     }
 
     override fun notifyDirection(direction: Direction?) {
         badDirection = direction
+    }
+
+    fun shot(): Bullet {
+        return Bullet(currentDirection,{bulletWidth,bulletHeight->
+            var bulletX = 0
+            var bulletY = 0
+            when(currentDirection){
+                Direction.UP->{
+                    bulletX = this.x + (width-bulletWidth)/2
+                    bulletY = this.y - bulletHeight/2
+                }
+                Direction.LEFT->{
+                    bulletX = this.x - bulletWidth/2
+                    bulletY = this.y + (height-bulletHeight)/2
+                }
+                Direction.RIGHT->{
+                    bulletX = this.x + width+bulletWidth/2
+                    bulletY = this.y + (height-bulletHeight)/2
+                }
+                Direction.DOWN->{
+                    bulletX = this.x + (width-bulletWidth)/2
+                    bulletY = this.y + height+bulletHeight/2
+                }
+            }
+            Pair(bulletX,bulletY)
+        })
     }
 }

@@ -2,20 +2,26 @@ package me.liujie95.game
 
 import javafx.scene.input.KeyCode
 import javafx.scene.input.KeyEvent
-import me.liujie95.game.business.Blockable
-import me.liujie95.game.business.Movable
+import me.liujie95.game.business.*
 import me.liujie95.game.enums.Direction
 import me.liujie95.game.model.*
 import org.itheima.kotlin.game.core.Window
 import java.io.File
-import kotlin.math.tan
+import java.util.concurrent.CopyOnWriteArrayList
 
 class GameWindow:Window(title = Config.gameName,
                         icon = Config.gameIcon,
                         width = Config.gameWidth,
                         height = Config.gameHeight) {
 
-    private val views = arrayListOf<View>()
+    /**
+     * 不安全的集合：子线程做增删会报错
+     */
+//    private val views = arrayListOf<View>()
+    /**
+     * 线程安全的集合
+     */
+    private val views = CopyOnWriteArrayList<View>()
     private lateinit var tank:Tank
 
     override fun onCreate() {
@@ -60,6 +66,10 @@ class GameWindow:Window(title = Config.gameName,
             KeyCode.D->{
                 tank.move(Direction.RIGHT)
             }
+            KeyCode.SPACE->{
+                val bullet = tank.shot()
+                views.add(bullet)
+            }
         }
     }
 
@@ -71,6 +81,28 @@ class GameWindow:Window(title = Config.gameName,
                 block as Blockable
                 val direction = move.willCollision(block)
                 move.notifyDirection(direction)
+            }
+        }
+
+        views.filter { it is AutoMovable }.forEach {
+            (it as AutoMovable).autoMove()
+        }
+
+        views.filter { it is Destoryable }.forEach {
+            if((it as Destoryable).isDestoryed()){
+                views.remove(it)
+            }
+        }
+
+        views.filter { it is Attackable }.forEach { attack->
+            attack as Attackable
+            views.filter{it is Sufferable}.forEach sufferTag@ {suffer->
+                suffer as Sufferable
+                if(attack.isCollision(suffer)){
+                    attack.notifyAttack(suffer)
+                    suffer.notifySuffer(attack)
+                    return@sufferTag
+                }
             }
         }
     }
