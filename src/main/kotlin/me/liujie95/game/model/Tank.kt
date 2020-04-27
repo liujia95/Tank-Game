@@ -17,26 +17,29 @@ class Tank(override var x: Int, override var y: Int) : Movable {
     override val speed = 8
 
     var badDirection:Direction? = null
+    var badBlock:Blockable? = null
 
     override fun draw() {
         var imagePath = when(currentDirection){
-            Direction.UP->"/img/tank/tankU.gif"
-            Direction.DOWN-> "/img/tank/tankD.gif"
-            Direction.LEFT-> "/img/tank/tankL.gif"
-            Direction.RIGHT->"/img/tank/tankR.gif"
+            Direction.UP->"/img/tank_u.gif"
+            Direction.DOWN-> "/img/tank_d.gif"
+            Direction.LEFT-> "/img/tank_l.gif"
+            Direction.RIGHT->"/img/tank_r.gif"
         }
         Painter.drawImage(imagePath,x,y)
     }
 
     fun move(direction: Direction){
+        if(badDirection == direction){
+            System.out.println("bad direction:"+badDirection)
+            return
+        }
+
         if(currentDirection!=direction){
             currentDirection = direction;
             return
         }
 
-        if(direction == badDirection){
-            return
-        }
 
         when(currentDirection){
             Direction.UP -> y-=speed
@@ -64,18 +67,11 @@ class Tank(override var x: Int, override var y: Int) : Movable {
             Direction.RIGHT ->x+=speed
         }
         //检测碰撞，下一步是否碰撞
-//        val collision = when {
-//            block.y+block.height<=y -> false
-//            y+height<=block.y -> false
-//            block.x+block.width<=x -> false
-//            x+width>block.x -> false
-//            else -> true
-//        }
         val collision = checkCollision(block.x,block.y,block.width,block.height,x,y,width,height)
         return if(collision)currentDirection else null
     }
 
-    override fun notifyDirection(direction: Direction?) {
+    override fun notifyDirection(direction: Direction?,block: Blockable?) {
         badDirection = direction
     }
 

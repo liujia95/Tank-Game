@@ -21,5 +21,5 @@ interface Movable : View {
     /**
      * 通知碰撞发生的方向
      */
-    fun notifyDirection(direction: Direction?)
+    fun notifyDirection(direction: Direction?,block: Blockable?)
 }

@@ -10,6 +10,6 @@ class Grass(override val x: Int, override val y: Int): Blockable {
     override var height:Int = Config.block
 
     override fun draw(){
-        Painter.drawImage("img/obstacle/grass.png",x,y)
+        Painter.drawImage("img/grass.gif",x,y)
     }
 }

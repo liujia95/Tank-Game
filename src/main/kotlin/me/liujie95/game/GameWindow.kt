@@ -76,12 +76,20 @@ class GameWindow:Window(title = Config.gameName,
     override fun onRefresh() {
         //检测碰撞
         views.filter { it is Movable }.forEach { move->
-            views.filter { it is Blockable }.forEach { block->
-                move as Movable
+            move as Movable
+            var badDirection :Direction? = null
+            var badBlock:Blockable? = null
+            views.filter { it is Blockable }.forEach blockTag@{ block->
                 block as Blockable
+
                 val direction = move.willCollision(block)
-                move.notifyDirection(direction)
+                direction?.let {
+                    badDirection = direction
+                    badBlock = block
+                    return@blockTag
+                }
             }
+            move.notifyDirection(badDirection,badBlock)
         }
 
         views.filter { it is AutoMovable }.forEach {
@@ -100,7 +108,11 @@ class GameWindow:Window(title = Config.gameName,
                 suffer as Sufferable
                 if(attack.isCollision(suffer)){
                     attack.notifyAttack(suffer)
-                    suffer.notifySuffer(attack)
+
+                    val sufferView = suffer.notifySuffer(attack)
+                    sufferView?.let {
+                        views.addAll(sufferView)
+                    }
                     return@sufferTag
                 }
             }

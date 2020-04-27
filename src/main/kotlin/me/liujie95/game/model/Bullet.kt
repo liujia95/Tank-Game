@@ -27,10 +27,10 @@ class Bullet(val direction:Direction,
     private var isDestoryed = false
 
     private var imagePath = when(direction){
-        Direction.UP ->  "img/bulletU.gif"
-        Direction.LEFT -> "img/bulletL.gif"
-        Direction.RIGHT -> "img/bulletR.gif"
-        Direction.DOWN -> "img/bulletD.gif"
+        Direction.UP ->  "img/bullet_u.gif"
+        Direction.LEFT -> "img/bullet_l.gif"
+        Direction.RIGHT -> "img/bullet_r.gif"
+        Direction.DOWN -> "img/bullet_d.gif"
     }
 
     init {

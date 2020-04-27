@@ -7,7 +7,7 @@ object Config {
 
     var gameIcon = "/img/bomb.gif"
 
-    val block = 60
+    val block = 64
 
     val gameWidth = block*13
 

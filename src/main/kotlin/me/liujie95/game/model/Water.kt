@@ -9,6 +9,6 @@ class Water(override val x: Int, override val y: Int) :View{
     override var height:Int = Config.block
     //显示行为
     override fun draw(){
-        Painter.drawImage("img/obstacle/water.gif",x,y)
+        Painter.drawImage("img/water.gif",x,y)
     }
 }

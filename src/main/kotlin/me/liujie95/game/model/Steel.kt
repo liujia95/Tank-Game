@@ -10,6 +10,6 @@ class Steel(override val x: Int, override val y: Int) :Blockable{
     override var height:Int = Config.block
     //显示行为
     override fun draw(){
-        Painter.drawImage("img/steels.gif",x,y)
+        Painter.drawImage("img/steel.gif",x,y)
     }
 }
