@@ -36,6 +36,7 @@ class GameWindow:Window(title = Config.gameName,
                     '草'-> views.add(Grass(columnCount*Config.block,lineCount*Config.block))
                     '铁'-> views.add(Steel(columnCount*Config.block,lineCount*Config.block))
                     '水'-> views.add(Water(columnCount*Config.block,lineCount*Config.block))
+                    '敌'-> views.add(Enemy(columnCount*Config.block,lineCount*Config.block))
                 }
                 columnCount++
             }
@@ -79,7 +80,7 @@ class GameWindow:Window(title = Config.gameName,
             move as Movable
             var badDirection :Direction? = null
             var badBlock:Blockable? = null
-            views.filter { it is Blockable }.forEach blockTag@{ block->
+            views.filter { (it is Blockable) and (move!=it) }.forEach blockTag@{ block->
                 block as Blockable
 
                 val direction = move.willCollision(block)
@@ -115,6 +116,14 @@ class GameWindow:Window(title = Config.gameName,
                     }
                     return@sufferTag
                 }
+            }
+        }
+
+        views.filter { it is AutoShot }.forEach {
+            it as AutoShot
+            val shot = it.autoShot()
+            shot?.let {
+                views.add(shot)
             }
         }
     }

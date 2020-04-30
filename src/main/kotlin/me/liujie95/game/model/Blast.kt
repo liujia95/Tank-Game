@@ -27,7 +27,7 @@ class Blast(override val x: Int, override val y: Int) :Destoryable{
     }
 
     override fun isDestoryed(): Boolean {
-        return index>=imagePaths.size®
+        return index>=imagePaths.size
     }
 
 }

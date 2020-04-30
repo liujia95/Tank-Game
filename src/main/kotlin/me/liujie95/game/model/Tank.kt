@@ -20,7 +20,7 @@ class Tank(override var x: Int, override var y: Int) : Movable {
     var badBlock:Blockable? = null
 
     override fun draw() {
-        var imagePath = when(currentDirection){
+        val imagePath = when(currentDirection){
             Direction.UP->"/img/tank_u.gif"
             Direction.DOWN-> "/img/tank_d.gif"
             Direction.LEFT-> "/img/tank_l.gif"
@@ -56,20 +56,20 @@ class Tank(override var x: Int, override var y: Int) : Movable {
     }
 
     //检测碰撞
-    override fun willCollision(block: Blockable): Direction? {
-        var x = this.x
-        var y = this.y
-        //将要碰撞时去做判断
-        when(currentDirection){
-            Direction.UP -> y-=speed
-            Direction.DOWN -> y+=speed
-            Direction.LEFT -> x-=speed
-            Direction.RIGHT ->x+=speed
-        }
-        //检测碰撞，下一步是否碰撞
-        val collision = checkCollision(block.x,block.y,block.width,block.height,x,y,width,height)
-        return if(collision)currentDirection else null
-    }
+//    override fun willCollision(block: Blockable): Direction? {
+//        var x = this.x
+//        var y = this.y
+//        //将要碰撞时去做判断
+//        when(currentDirection){
+//            Direction.UP -> y-=speed
+//            Direction.DOWN -> y+=speed
+//            Direction.LEFT -> x-=speed
+//            Direction.RIGHT ->x+=speed
+//        }
+//        //检测碰撞，下一步是否碰撞
+//        val collision = checkCollision(block.x,block.y,block.width,block.height,x,y,width,height)
+//        return if(collision)currentDirection else null
+//    }
 
     override fun notifyDirection(direction: Direction?,block: Blockable?) {
         badDirection = direction
