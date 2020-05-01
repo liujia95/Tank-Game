@@ -12,4 +12,6 @@ interface Destoryable: View {
      */
     fun isDestoryed():Boolean
 
+    fun showDestory():Array<View>?{return null}
+
 }

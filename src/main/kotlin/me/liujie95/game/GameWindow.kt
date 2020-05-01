@@ -24,6 +24,18 @@ class GameWindow:Window(title = Config.gameName,
     private val views = CopyOnWriteArrayList<View>()
     private lateinit var tank:Tank
 
+    private var gameOver :Boolean = false
+
+    private var enemyTotalSize = 2
+
+    //敌方坦克在地图上最可可显示几个
+    private var enemyActiveSize = 1
+
+    //地方出生点
+    private var enemyBornLocation = arrayListOf<Pair<Int,Int>>()
+
+    private var bornIndex:Int = 0
+
     override fun onCreate() {
         val file = File(javaClass.getResource("/map/1.map").path)
         val lines = file.readLines()
@@ -36,7 +48,7 @@ class GameWindow:Window(title = Config.gameName,
                     '草'-> views.add(Grass(columnCount*Config.block,lineCount*Config.block))
                     '铁'-> views.add(Steel(columnCount*Config.block,lineCount*Config.block))
                     '水'-> views.add(Water(columnCount*Config.block,lineCount*Config.block))
-                    '敌'-> views.add(Enemy(columnCount*Config.block,lineCount*Config.block))
+                    '敌'->enemyBornLocation.add(Pair(columnCount*Config.block,lineCount*Config.block))
                 }
                 columnCount++
             }
@@ -45,6 +57,8 @@ class GameWindow:Window(title = Config.gameName,
 
         tank = Tank(Config.block * 10, Config.block * 12)
         views.add(tank)
+
+        views.add(Camp(Config.gameWidth/2-64,Config.gameHeight-96))
     }
 
     override fun onDisplay() {
@@ -54,27 +68,45 @@ class GameWindow:Window(title = Config.gameName,
     }
 
     override fun onKeyPressed(event: KeyEvent) {
-        when(event.code){
-            KeyCode.W->{
-                tank.move(Direction.UP)
-            }
-            KeyCode.S->{
-                tank.move(Direction.DOWN)
-            }
-            KeyCode.A->{
-                tank.move(Direction.LEFT)
-            }
-            KeyCode.D->{
-                tank.move(Direction.RIGHT)
-            }
-            KeyCode.SPACE->{
-                val bullet = tank.shot()
-                views.add(bullet)
+        if(!gameOver){
+            when(event.code){
+                KeyCode.W->{
+                    tank.move(Direction.UP)
+                }
+                KeyCode.S->{
+                    tank.move(Direction.DOWN)
+                }
+                KeyCode.A->{
+                    tank.move(Direction.LEFT)
+                }
+                KeyCode.D->{
+                    tank.move(Direction.RIGHT)
+                }
+                KeyCode.SPACE->{
+                    val bullet = tank.shot()
+                    views.add(bullet)
+                }
             }
         }
     }
 
     override fun onRefresh() {
+        views.filter { it is Destoryable }.forEach {
+            if((it as Destoryable).isDestoryed()){
+                views.remove(it)
+
+                if(it is Enemy){
+                    enemyTotalSize--
+                }
+
+                val destory = it.showDestory()
+                destory?.let {
+                    views.addAll(destory)
+                }
+            }
+        }
+
+        if(gameOver) return
         //检测碰撞
         views.filter { it is Movable }.forEach { move->
             move as Movable
@@ -97,15 +129,11 @@ class GameWindow:Window(title = Config.gameName,
             (it as AutoMovable).autoMove()
         }
 
-        views.filter { it is Destoryable }.forEach {
-            if((it as Destoryable).isDestoryed()){
-                views.remove(it)
-            }
-        }
-
         views.filter { it is Attackable }.forEach { attack->
             attack as Attackable
-            views.filter{it is Sufferable}.forEach sufferTag@ {suffer->
+            //攻击方的源不能是发射方
+            //攻击方不能是挨打者
+            views.filter{(it is Sufferable) and (attack.owner!= it) and (attack != it)}.forEach sufferTag@ {suffer->
                 suffer as Sufferable
                 if(attack.isCollision(suffer)){
                     attack.notifyAttack(suffer)
@@ -126,6 +154,20 @@ class GameWindow:Window(title = Config.gameName,
                 views.add(shot)
             }
         }
+
+        //检测敌方坦克出生
+        if((enemyTotalSize>0) and (views.filter { it is Enemy }.size<enemyActiveSize)){
+            val index = bornIndex%enemyBornLocation.size
+            val pair = enemyBornLocation[index]
+            views.add(Enemy(pair.first,pair.second))
+            bornIndex++
+        }
+
+        if((views.filter { it is Camp }.isEmpty()) or (enemyTotalSize<=0)){
+            gameOver = true
+        }
     }
+
+
 
 }

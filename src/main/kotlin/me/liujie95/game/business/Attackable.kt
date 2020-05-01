@@ -7,6 +7,9 @@ import me.liujie95.game.model.View
  */
 interface Attackable:View {
 
+    //攻击者
+    val owner:View
+
     val attackPower:Int
 
     fun isCollision(sufferable: Sufferable):Boolean

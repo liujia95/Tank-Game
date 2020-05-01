@@ -1,14 +1,19 @@
 package me.liujie95.game.model
 
 import me.liujie95.game.Config
+import me.liujie95.game.business.Attackable
 import me.liujie95.game.business.Blockable
 import me.liujie95.game.business.Movable
+import me.liujie95.game.business.Sufferable
 import me.liujie95.game.enums.Direction
 import org.itheima.kotlin.game.core.Painter
 import java.awt.Rectangle
 import java.awt.geom.Rectangle2D
 
-class Tank(override var x: Int, override var y: Int) : Movable {
+class Tank(override var x: Int, override var y: Int) : Movable ,Blockable,Sufferable{
+
+    override var blood: Int = 20
+
     override val width: Int = Config.block
     override val height: Int = Config.block
 
@@ -76,7 +81,7 @@ class Tank(override var x: Int, override var y: Int) : Movable {
     }
 
     fun shot(): Bullet {
-        return Bullet(currentDirection,{bulletWidth,bulletHeight->
+        return Bullet(this,currentDirection,{bulletWidth,bulletHeight->
             var bulletX = 0
             var bulletY = 0
             when(currentDirection){
@@ -99,5 +104,10 @@ class Tank(override var x: Int, override var y: Int) : Movable {
             }
             Pair(bulletX,bulletY)
         })
+    }
+
+    override fun notifySuffer(attackable: Attackable): Array<View>? {
+        blood -= attackable.attackPower
+        return arrayOf(Blast(x,y))
     }
 }

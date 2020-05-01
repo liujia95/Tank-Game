@@ -9,9 +9,9 @@ import me.liujie95.game.enums.Direction
 import me.liujie95.game.ext.checkCollision
 import org.itheima.kotlin.game.core.Painter
 
-class Bullet(val direction:Direction,
+class Bullet(override val owner: View,val direction:Direction,
              create:(width:Int,height:Int)-> Pair<Int,Int>)
-    :AutoMovable,Destoryable,Attackable{
+    :AutoMovable,Destoryable,Attackable,Sufferable{
 
     override var width: Int =  Config.block
     override var height: Int = Config.block
@@ -20,6 +20,7 @@ class Bullet(val direction:Direction,
 
     override val currentDirection: Direction = direction
     override val speed: Int = 8
+    override var blood: Int = 1
 
     override var x: Int = 0
     override var y: Int = 0
@@ -72,5 +73,9 @@ class Bullet(val direction:Direction,
 
     override fun notifyAttack(sufferable: Sufferable) {
         isDestoryed = true
+    }
+
+    override fun notifySuffer(attackable: Attackable): Array<View>? {
+        return arrayOf(Blast(x,y))
     }
 }

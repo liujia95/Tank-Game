@@ -1,11 +1,8 @@
 package me.liujie95.game.model
 
-import me.liujie95.game.business.AutoMovable
 import me.liujie95.game.enums.Direction
 import me.liujie95.game.Config;
-import me.liujie95.game.business.AutoShot
-import me.liujie95.game.business.Blockable
-import me.liujie95.game.business.Movable
+import me.liujie95.game.business.*
 import org.itheima.kotlin.game.core.Painter
 import java.util.*
 
@@ -13,8 +10,14 @@ import java.util.*
  * 敌方坦克
  * 可移动（避开阻挡物）
  * 自己移动（自己动起来）
+ * 阻塞移动
+ * 自动射击
+ * 被打
  */
-class Enemy(override var x: Int, override var y: Int) : Movable,AutoMovable,Blockable,AutoShot {
+class Enemy(override var x: Int, override var y: Int) :
+        Movable,AutoMovable,Blockable,AutoShot,Sufferable,Destoryable {
+
+    override var blood: Int = 2
 
     override var currentDirection: Direction=Direction.DOWN
     override val speed: Int = 8
@@ -88,7 +91,7 @@ class Enemy(override var x: Int, override var y: Int) : Movable,AutoMovable,Bloc
         if(currentTime - lastShotTime < shotFrequency) return null
         lastShotTime = currentTime
 
-        return Bullet(currentDirection,{bulletWidth,bulletHeight->
+        return Bullet(this,currentDirection,{bulletWidth,bulletHeight->
             var bulletX = 0
             var bulletY = 0
             when(currentDirection){
@@ -112,5 +115,16 @@ class Enemy(override var x: Int, override var y: Int) : Movable,AutoMovable,Bloc
             Pair(bulletX,bulletY)
         })
     }
+
+    override fun notifySuffer(attackable: Attackable): Array<View>? {
+        if(attackable.owner is Enemy){
+            return null
+        }
+        blood -= attackable.attackPower
+        return arrayOf(Blast(x,y))
+    }
+
+    override fun isDestoryed(): Boolean = blood <= 0
+
 
 }
