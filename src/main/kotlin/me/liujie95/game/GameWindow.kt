@@ -6,7 +6,9 @@ import me.liujie95.game.business.*
 import me.liujie95.game.enums.Direction
 import me.liujie95.game.model.*
 import org.itheima.kotlin.game.core.Window
+import java.io.BufferedReader
 import java.io.File
+import java.io.InputStreamReader
 import java.util.concurrent.CopyOnWriteArrayList
 
 class GameWindow:Window(title = Config.gameName,
@@ -37,8 +39,12 @@ class GameWindow:Window(title = Config.gameName,
     private var bornIndex:Int = 0
 
     override fun onCreate() {
-        val file = File(javaClass.getResource("/map/1.map").path)
-        val lines = file.readLines()
+//        val file = File(javaClass.getResource("/map/1.map").path)
+
+        //在压缩包里要用这种引用地址的方式
+        val resourceAsStream = javaClass.getResourceAsStream("/map/1.map")
+        val read = BufferedReader(InputStreamReader(resourceAsStream, "utf-8"))
+        val lines = read.readLines()
         var lineCount = 0
         lines.forEach{ line->
             var columnCount = 0
